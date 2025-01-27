@@ -85,7 +85,6 @@ public class Menu {
         }
 
     }
-
     private void waitRead() {
         System.out.println("\n Для продолжения нажмите Enter...");
         scanner.nextLine();
@@ -111,7 +110,7 @@ public class Menu {
 
 
     private void showUserMenu() {
-        exitUserMenu=false;
+      //  exitUserMenu=false;
         while (true) {
             System.out.println();
             System.out.println();
