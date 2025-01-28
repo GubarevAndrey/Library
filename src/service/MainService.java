@@ -14,6 +14,8 @@ public interface MainService {
 
     boolean loginUser(String email, String password);
 
+    public boolean isUserBLOCKED(String email);
+
     void logout();
 
     //Удаление Пользователя

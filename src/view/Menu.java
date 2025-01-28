@@ -26,28 +26,36 @@ public class Menu {
         showMenu();
     }
 
-    private void showMenu(){
-        while (true) {
-            System.out.println();
-            System.out.println();
-            System.out.println("╔════════════════════════════════════════╗");
-            System.out.println("║   ДОБРО ПОЖАЛОВАТЬ В МЕНЮ БИБЛИОТЕКИ:  ║");
-            System.out.println("║         1. Меню книг                   ║");
-            System.out.println("║         2. Меню пользователя           ║");
-            System.out.println("║         3. Меню администратора         ║");
-            System.out.println("║         0- выход из системы            ║");
-            System.out.println("╚════════════════════════════════════════╝");
-            System.out.print("Сделайте выбор:");
+    private void showMenu() {
+        boolean isAutoriz;
+        System.out.println();
+        System.out.println();
+        isAutoriz = authorization();
+        if (isAutoriz == true) {
+            while (true) {
+                System.out.println();
+                System.out.println();
+                System.out.println("╔════════════════════════════════════════╗");
+                System.out.println("║   ДОБРО ПОЖАЛОВАТЬ В МЕНЮ БИБЛИОТЕКИ:  ║");
+                System.out.println("║         1. Меню книг                   ║");
+                System.out.println("║         2. Меню пользователя           ║");
+                System.out.println("║         3. Меню администратора         ║");
+                System.out.println("║         0- выход из системы            ║");
+                System.out.println("╚════════════════════════════════════════╝");
+                System.out.print("Сделайте выбор:");
 
-            String choice= scanner.nextLine();
+                String choice = scanner.nextLine();
 
-            if (choice.equals("0") ) {
-                System.out.println("Давай До свидания...");
-                // Завершить работу приложения
-                System.exit(0);
+                if (choice.equals("0")) {
+                    System.out.println("Давай До свидания...");
+                    // Завершить работу приложения
+                    System.exit(0);
+                }
+                showMenuCase(choice);
+
             }
-            showMenuCase(choice);
-
+        }else {
+            System.out.println("ОШИБКА авторизации !");
         }
     }
 
@@ -55,30 +63,17 @@ public class Menu {
         boolean isAutoriz;
         switch (choice) {
             case "1":
-
-                isAutoriz=authorization();
-                if (isAutoriz==true) {
                     showBookMenu();
-                }
                 break;
             case "2":
-
-                isAutoriz=authorization();
-                if (isAutoriz==true) {
                     showUserMenu();
-                }
                 break;
             case "3":
-                isAutoriz=authorization();
-                if (isAutoriz==true ){
                     if(service.getActivUser().getRole()== Role.ADMIN) {
                         showAdminMenu();
                     }else {
                         System.out.println("Вы не являетесь Администратором !");
                     }
-                } else {
-                    System.out.println("Авторизация провалена !");
-                }
                 break;
             default:
                 System.out.println("Сделайте корректный выбор...");
@@ -97,16 +92,20 @@ public class Menu {
         System.out.println("Авторизация");
         System.out.print("Введите email:");
         String email= scanner.nextLine();
-        System.out.print("Введите пароль:");
-        String password= scanner.nextLine();
+        if(email.length()!=0 && email!=null) {
+            if (service.isUserBLOCKED(email) == true) {
+                System.out.println("Вы ЗАБАНЕНЫ! Обратитесь к Администратору");
+                return false;
+            }
+            System.out.print("Введите пароль:");
+            String password = scanner.nextLine();
 
-        boolean log=service.loginUser(email,password);
-        if (log==true){
-            return true;
-        } else {
-
-            return false;
+            boolean log = service.loginUser(email, password);
+            if (log == true) {
+                return true;
+            }
         }
+        return false;
     }
 
 
@@ -119,15 +118,13 @@ public class Menu {
             System.out.println("│   1. Список книг у пользователя      │");
             System.out.println("│   2. Выдача книги                    │");
             System.out.println("│   3. Возврат книги                   │");
-            System.out.println("│   0. logout пользователя и           │");
-            System.out.println("│      возврат в предыдущее меню       │");
+            System.out.println("│   0. Возврат в предыдущее меню       │");
             System.out.println("└──────────────────────────────────────┘");
             System.out.printf(service.getActivUser().getRole()==Role.ADMIN ? "(ВЫ АДМИНИСТРАТОР -'":"(ВЫ ПОЛЬЗОВАТЕЛЬ -'");
             System.out.print(service.getActivUser().getEmail()+"') Сделайте выбор:") ;
             String input= scanner.nextLine();
             showUserMenuCase(input);
             if (exitUserMenu==true) break;
-
             waitRead();
 
         }
@@ -208,7 +205,6 @@ public class Menu {
 
             case "0":
                 //logout:
-                service.logout();
                 exitUserMenu=true;
                 System.out.println("Вы вышли из Меню пользователя");
                 break;
@@ -234,8 +230,7 @@ public class Menu {
             System.out.println("│  7. Удаление книги                   │");
             System.out.println("│  8. Редактирование книги             │");
             System.out.println("│  9. Список всех книг                 │");
-            System.out.println("│  0. logout администратора и          │");
-            System.out.println("│      возврат в предыдущ меню         │");
+            System.out.println("│  0. Возврат в предыдущ меню          │");
             System.out.println("└──────────────────────────────────────┘");
             System.out.printf(service.getActivUser().getRole()==Role.ADMIN ? "(ВЫ АДМИНИСТРАТОР -'":"(ВЫ ПОЛЬЗОВАТЕЛЬ -'");
             System.out.print(service.getActivUser().getEmail()+"') Сделайте выбор:") ;
@@ -417,7 +412,7 @@ public class Menu {
                 name= scanner.nextLine();
                 System.out.print("Введите Нового автора книги:");
                 author= scanner.nextLine();
-                isUpdateBook=service.delBookById(idBook);
+                isUpdateBook=service.bookUpdateById(idBook,name,author);
                 if (isUpdateBook==true){
                     System.out.println("Книга успешно Изменена");
                 } else {
@@ -461,7 +456,6 @@ public class Menu {
 
             case "0":
                 //logout администратора и возврат в предыдущ меню
-                service.logout();
                 exitAdminMenu=true;
                 System.out.println("Вы вышли из Меню Администратора");
                 waitRead();

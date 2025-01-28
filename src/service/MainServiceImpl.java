@@ -52,34 +52,40 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public boolean loginUser(String email, String password) {
-           if (activUser!=null) {
-              logout();
-            }
             // Проверим есть ли такой пользователь
             if (!userRepository.isEmailExist(email)) {
                 System.out.println("Пользователя с Email - " + email + " нет ! Сначала зарегистрируйтесь");
                 return false;
             }
-            for (User user : userRepository.getUsers()) {
-                if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                    if (user.getRole() == Role.ADMIN) {
-                        activUser = user;
-                        activUser.setRole(Role.ADMIN);
-                        return true;
-                    }
-                    if (user.getRole() == Role.USER) {
-                        activUser = user;
-                        activUser.setRole(Role.USER);
-                        return true;
-                    }
-                    if (user.getRole() == Role.BLOCKED) {
-                        System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
-                        return false;
-                    }
-                }
+
+            User user=userRepository.getUserByEmail(email);
+            if (user != null && user.getPassword().equals(password)) {
+                 if (user.getRole() == Role.ADMIN) {
+                   activUser = user;
+                    activUser.setRole(Role.ADMIN);
+                   return true;
+                  }
+                  if (user.getRole() == Role.USER) {
+                      activUser = user;
+                      activUser.setRole(Role.USER);
+                      return true;
+                  }
+                  if (user.getRole() == Role.BLOCKED) {
+                      System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+                      return false;
+                  }
             }
             System.out.println("Пароль не верный");
             return false;
+    }
+
+    public boolean isUserBLOCKED(String email){
+        User user=userRepository.getUserByEmail(email);
+        if (user.getRole()==Role.BLOCKED) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -116,23 +122,19 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public Book takeBook(int bookId) {
-        boolean find=false;
         LocalDate date= LocalDate.now();
         if (activUser.getRole()!=Role.BLOCKED) {
-            for (Book book : bookRepository.getAllBooks()) {
-                if (book.getId() == bookId) {
-                    find=true;
-                    if(book.isBusy()==false) {
-                        book.setBusy(true);
-                        book.setUserUse(activUser.getEmail());
-                        book.setTakeDate(date);
-                        return book;
-                    }else {
-                        System.out.println("Книга с id:"+bookId+" занята");
-                    }
-                }
-            }
-            if (find==false) {
+            Book book = bookRepository.getById(bookId);
+            if (book!=null){
+                 if(book.isBusy()==false) {
+                    book.setBusy(true);
+                    book.setUserUse(activUser.getEmail());
+                    book.setTakeDate(date);
+                    return book;
+                 }else {
+                    System.out.println("Книга с id:"+bookId+" занята");
+                 }
+            } else {
                 System.out.println("Книга с id:"+bookId+" не существует");
             }
         }else {
@@ -144,30 +146,26 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public Book returnBook(int bookId) {
-        boolean find=false;
+   //     boolean find=false;
         if (activUser.getRole()!=Role.BLOCKED) {
-            for (Book book : bookRepository.getAllBooks()) {
-                if (book.getId() == bookId) {
-                    find=true;
-                    if(book.isBusy()==true && book.getUserUse().equals(activUser.getEmail())==true) {
-                        book.setBusy(false);
-                        book.setUserUse(null);
-                        book.setTakeDate(null);
-                        return book;
-                    }else {
-                        System.out.println("Вы не брали книгу Название:"+book.getName()+
-                                "  Автор:"+book.getAuthor()+"  ID:"+book.getId());
-                    }
+            Book book = bookRepository.getById(bookId);
+            if (book!=null){
+                if(book.isBusy()==true && book.getUserUse().equals(activUser.getEmail())==true) {
+                    book.setBusy(false);
+                    book.setUserUse(null);
+                    book.setTakeDate(null);
+                    return book;
+                }else {
+                    System.out.println("Вы не брали книгу Название:"+book.getName()+
+                            "  Автор:"+book.getAuthor()+"  ID:"+book.getId());
                 }
-            }
-            if (find==false) {
-                System.out.println("Книга с id:"+bookId+" не существует");
+            } else {
+                 System.out.println("Книга с id:"+bookId+" не существует");
             }
         }else {
             System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
         }
         return null;
-
     }
 
     @Override
@@ -258,13 +256,13 @@ public class MainServiceImpl implements MainService{
     @Override
     public boolean bookUpdateById(int id,String name, String author) {
         if (activUser.getRole()==Role.ADMIN) {
-            for (Book book : bookRepository.getAllBooks()) {
-                if (book.getId() == id) {
-                    bookRepository.bookUpdateById(id,name,author);
-                    return true;
-                }
+            Book book = bookRepository.getById(id);
+            if (book!=null) {
+                bookRepository.bookUpdateById(id, name, author);
+                return true;
+            } else {
+                System.out.println("Вы ввели не правильный id книги");
             }
-            System.out.println("Вы ввели не правильный id книги");
         }else {
             System.out.println("Редактировать книги может только администратор");
         }
@@ -275,17 +273,16 @@ public class MainServiceImpl implements MainService{
     @Override
     public boolean UserUpdatePassword(String email,String password) {
         if (activUser.getRole()==Role.ADMIN ) {
-            if(PersonValidation.isPasswordValid(password)) {
-                for (User user : userRepository.getUsers()) {
-                    if (user.getEmail().equals(email)) {
-                        if (!PersonValidation.isPasswordValid(password))
-                            userRepository.UserUpdatePassword(email, password);
-                            return true;
-                    }
+            User user =userRepository.getUserByEmail(email);
+            if (user!=null) {
+                if(PersonValidation.isPasswordValid(password)) {
+                    userRepository.UserUpdatePassword(email, password);
+                    return true;
+                } else {
+                    System.out.println("Пароль - "+password+" не корректный.");
                 }
-                System.out.println("Пользователя с Email- "+email+" не существует!");
             } else {
-                System.out.println("Пароль - "+password+" не корректный.");
+                System.out.println("Пользователя с Email- "+email+" не существует!");
             }
         }
         return false;
