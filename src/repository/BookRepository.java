@@ -4,6 +4,8 @@ import model.User;
 import utils.MyList;
 import model.Book;
 
+import java.time.LocalDate;
+
 public interface BookRepository {
     //1.Create
     public void  addBook(String name, String author);
@@ -40,4 +42,8 @@ public interface BookRepository {
     public MyList<Book> getBooksSortByName();
 
     public MyList<Book> getBooksSortByAuthor();
+
+    public LocalDate getTakeBookDate (int idBook);
+
+    public boolean updateTakeBookDate (int idBook, LocalDate newDate);
 }

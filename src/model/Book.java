@@ -3,6 +3,7 @@ package model;
 import utils.MyArrayList;
 import utils.MyList;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ public class Book {
    private boolean isBusy;
    private String userEmail;
    private final int id;
-   private Date takeDate;
+   private LocalDate takeDate;
 
 
 
@@ -25,13 +26,14 @@ public class Book {
       this.takeDate=null;
    }
 
-   public Date getTakeDate() {
+   public LocalDate getTakeDate() {
       return takeDate;
    }
 
-   public void setTakeDate(Date takeDate) {
+   public void setTakeDate(LocalDate takeDate) {
       this.takeDate = takeDate;
    }
+
    public String getName() {
       return name;
    }

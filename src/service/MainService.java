@@ -5,6 +5,8 @@ import model.Book;
 import model.Role;
 import utils.MyList;
 
+import java.time.LocalDate;
+
 public interface MainService {
 
     public User getActivUser();
@@ -68,5 +70,9 @@ public interface MainService {
     public MyList<Book> getBooksSortByName();
 
     public MyList<Book> getBooksSortByAuthor();
+
+    public LocalDate getTakeBookDate(int idBook);
+
+    public boolean updateTakeBookDate(int idBook, LocalDate newDate);
 
 }

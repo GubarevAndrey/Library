@@ -8,6 +8,8 @@ import repository.UserRepository;
 import utils.MyList;
 import utils.PersonValidation;
 
+import java.time.LocalDate;
+
 public class MainServiceImpl implements MainService{
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
@@ -111,6 +113,7 @@ public class MainServiceImpl implements MainService{
     @Override
     public Book takeBook(int bookId) {
         boolean find=false;
+        LocalDate date= LocalDate.now();
         if (activUser.getRole()!=Role.BLOCKED) {
             for (Book book : bookRepository.getAllBooks()) {
                 if (book.getId() == bookId) {
@@ -118,6 +121,7 @@ public class MainServiceImpl implements MainService{
                     if(book.isBusy()==false) {
                         book.setBusy(true);
                         book.setUserUse(activUser.getEmail());
+                        book.setTakeDate(date);
                         return book;
                     }else {
                         System.out.println("Книга с id:"+bookId+" занята");
@@ -141,12 +145,14 @@ public class MainServiceImpl implements MainService{
             for (Book book : bookRepository.getAllBooks()) {
                 if (book.getId() == bookId) {
                     find=true;
-                    if(book.isBusy()==true) {
+                    if(book.isBusy()==true && book.getUserUse().equals(activUser.getEmail())==true) {
                         book.setBusy(false);
                         book.setUserUse(null);
+                        book.setTakeDate(null);
                         return book;
                     }else {
-                        System.out.println("Книга с id:"+bookId+" не была занята");
+                        System.out.println("Вы не брали книгу Название:"+book.getName()+
+                                "  Автор:"+book.getAuthor()+"  ID:"+book.getId());
                     }
                 }
             }
@@ -324,6 +330,16 @@ public class MainServiceImpl implements MainService{
             System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
         }
         return null;
+    }
+
+    @Override
+    public LocalDate getTakeBookDate(int idBook) {
+        return bookRepository.getTakeBookDate(idBook);
+    }
+
+    @Override
+    public boolean updateTakeBookDate(int idBook, LocalDate newDate) {
+        return bookRepository.updateTakeBookDate(idBook,newDate);
     }
 
 }

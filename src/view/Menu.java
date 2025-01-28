@@ -6,6 +6,8 @@ import model.Book;
 import service.MainService;
 import utils.MyList;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 public class Menu {
@@ -37,10 +39,9 @@ public class Menu {
             System.out.println("╚════════════════════════════════════════╝");
             System.out.print("Сделайте выбор:");
 
-            int choice= scanner.nextInt();
-            scanner.nextLine();
+            String choice= scanner.nextLine();
 
-            if (choice==0) {
+            if (choice.equals("0") ) {
                 System.out.println("Давай До свидания...");
                 // Завершить работу приложения
                 System.exit(0);
@@ -50,24 +51,24 @@ public class Menu {
         }
     }
 
-    private void showMenuCase(int choice) {
+    private void showMenuCase(String choice) {
         boolean isAutoriz;
         switch (choice) {
-            case 1:
+            case "1":
 
                 isAutoriz=authorization();
                 if (isAutoriz==true) {
                     showBookMenu();
                 }
                 break;
-            case 2:
+            case "2":
 
                 isAutoriz=authorization();
                 if (isAutoriz==true) {
                     showUserMenu();
                 }
                 break;
-            case 3:
+            case "3":
                 isAutoriz=authorization();
                 if (isAutoriz==true ){
                     if(service.getActivUser().getRole()== Role.ADMIN) {
@@ -110,47 +111,65 @@ public class Menu {
 
 
     private void showUserMenu() {
-      //  exitUserMenu=false;
+          exitUserMenu=false;
         while (true) {
             System.out.println();
-            System.out.println();
             System.out.println("┌──────────────────────────────────────┐");
-            System.out.println("│      ВЫ В МЕНЮ ПОЛЬЗОВАТЕЛЯ:         │");
+            System.out.println("│           МЕНЮ ПОЛЬЗОВАТЕЛЯ:         │");
             System.out.println("│   1. Список книг у пользователя      │");
             System.out.println("│   2. Выдача книги                    │");
             System.out.println("│   3. Возврат книги                   │");
             System.out.println("│   0. logout пользователя и           │");
             System.out.println("│      возврат в предыдущее меню       │");
             System.out.println("└──────────────────────────────────────┘");
-            System.out.print("Сделайте выбор:");
-
-           int input = scanner.nextInt();
-            scanner.nextLine();
-
-            if (input == 0) {
-                break;
-            }
-
-            if (exitUserMenu==true) break;
+            System.out.printf(service.getActivUser().getRole()==Role.ADMIN ? "(ВЫ АДМИНИСТРАТОР -'":"(ВЫ ПОЛЬЗОВАТЕЛЬ -'");
+            System.out.print(service.getActivUser().getEmail()+"') Сделайте выбор:") ;
+            String input= scanner.nextLine();
             showUserMenuCase(input);
+            if (exitUserMenu==true) break;
+
             waitRead();
 
         }
     }
 
 
-    private void showUserMenuCase(int input){
+    private void showUserMenuCase(String input){
+        int i=0;
+        String s1="";
+        String s2="";
+        int lenName=0;
+        int lenAuthor=0;
+        LocalDate date =LocalDate.now();
         MyList<Book> isActiveUserBooksList;
+        exitUserMenu=false;
         switch (input){
-            case 1://Список книг у пользователя
+            case "1"://Список книг у пользователя
                 String activeUserEmail=service.getActivUser().getEmail();
                 isActiveUserBooksList=service.getBooksByUser(activeUserEmail);
                 if(isActiveUserBooksList.size()>0) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
+                    for (Book book : service.getBooksByUser(service.getActivUser().getEmail())) {
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
                     System.out.println("Список книг у пользователя -"+service.getActivUser().getEmail()+" :");
                     for (Book book : service.getBooksByUser(service.getActivUser().getEmail())) {
-                        System.out.println(" Название: '" + book.getName()+"'"+ "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.println(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Взята:"+book.getTakeDate()+" ("+
+                                (date.until(book.getTakeDate(),ChronoUnit.DAYS))+" дней назад)");
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println();
@@ -158,8 +177,8 @@ public class Menu {
                 }
                 break;
 
-            case 2:
-               // Выдача книги
+            case "2":
+                // Выдача книги
                 System.out.println();
                 System.out.println();
                 System.out.println("Выдача книги:");
@@ -172,7 +191,7 @@ public class Menu {
                 }
                 break;
 
-            case 3:
+            case "3":
                 //Возврат книги
                 System.out.println();
                 System.out.println();
@@ -187,7 +206,7 @@ public class Menu {
                 }
                 break;
 
-            case 0:
+            case "0":
                 //logout:
                 service.logout();
                 exitUserMenu=true;
@@ -218,12 +237,11 @@ public class Menu {
             System.out.println("│  0. logout администратора и          │");
             System.out.println("│      возврат в предыдущ меню         │");
             System.out.println("└──────────────────────────────────────┘");
-            System.out.print("Сделайте выбор:");
+            System.out.printf(service.getActivUser().getRole()==Role.ADMIN ? "(ВЫ АДМИНИСТРАТОР -'":"(ВЫ ПОЛЬЗОВАТЕЛЬ -'");
+            System.out.print(service.getActivUser().getEmail()+"') Сделайте выбор:") ;
 
-            int input = scanner.nextInt();
-            scanner.nextLine();
-
-            if (input == 0) {
+            String input = scanner.nextLine();
+            if (input.equals("0")) {
                 break;
             }
 
@@ -234,7 +252,13 @@ public class Menu {
 
     }
 
-    private void showAdminMenuCase(int input) {
+    private void showAdminMenuCase(String input) {
+        int i=0;
+        String s1="";
+        String s2="";
+        int lenName=0;
+        int lenAuthor=0;
+        int lenEmail=0;
         String email;
         String password;
         String name;
@@ -246,10 +270,11 @@ public class Menu {
         boolean isUpdateBook;
         boolean isUserStatusUpdate;
         int idBook;
+        LocalDate date=LocalDate.now();
 
         switch (input) {
-            case 1:
-            //Регистрация нового пользователя
+            case "1":
+                //Регистрация нового пользователя
                 System.out.println();
                 System.out.println();
                 System.out.println("Регистрация нового Пользователя:");
@@ -266,7 +291,7 @@ public class Menu {
                 }
                 break;
 
-            case 2:
+            case "2":
                 //Изменение пароля пользователя
                 System.out.println();
                 System.out.println();
@@ -283,7 +308,7 @@ public class Menu {
                 }
                 break;
 
-            case 3:
+            case "3":
                 //Изменение Статуса пользователя
                 System.out.println();
                 System.out.println();
@@ -308,22 +333,31 @@ public class Menu {
                 }
                 break;
 
-            case 4:
+            case "4":
                 //Список всех пользователей
                 if(service.userList() !=null) {
+                    i=0;
                     System.out.println();
                     System.out.println();
+                    lenEmail=0;
                     System.out.println("Список пользователей:");
                     for (User user : service.userList()) {
-                        System.out.println(" Пользователь- " + user.getEmail()+ "  Права- " + user.getRole());
-
+                        if(user.getEmail().length()>lenEmail) lenEmail=user.getEmail().length();
+                    }
+                    for (User user : service.userList()) {
+                        i++;
+                        for(int j=0; j<lenEmail+2-user.getEmail().length();j++){
+                            s1=s1+" ";
+                        }
+                        System.out.println(i+") Пользователь- " + user.getEmail()+s1 + "  Права- " + user.getRole());
+                        s1="";
                     }
                 } else {
                     System.out.println("Пользователей нет");
                 }
                 break;
 
-            case 5:
+            case "5":
                 //Удаление пользователя
                 System.out.println();
                 System.out.println();
@@ -338,7 +372,7 @@ public class Menu {
                 }
                 break;
 
-            case 6:
+            case "6":
                 //Добавление книги
                 System.out.println();
                 System.out.println();
@@ -355,7 +389,7 @@ public class Menu {
                 }
                 break;
 
-            case 7:
+            case "7":
                 //Удаление книги
                 System.out.println();
                 System.out.println();
@@ -371,7 +405,7 @@ public class Menu {
                 }
                 break;
 
-            case 8:
+            case "8":
                 //Редактирование книги
                 System.out.println();
                 System.out.println();
@@ -391,21 +425,41 @@ public class Menu {
                 }
                 break;
 
-            case 9:
+            case "9":
                 //Список всех книг
                 if(service.getAllBooks()!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
                     System.out.println("Список всех книг:");
                     for(Book book: service.getAllBooks()) {
-                        System.out.println(" Название: '" + book.getName()+"'"+ "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getAllBooks()) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" За пользователем:'"+
+                                book.getUserUse()+"'  Взята:"+book.getTakeDate()+" ("+
+                                (date.until(book.getTakeDate(),ChronoUnit.DAYS))+" дней назад)");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг");
                 }
                 break;
 
-            case 0:
+            case "0":
                 //logout администратора и возврат в предыдущ меню
                 service.logout();
                 exitAdminMenu=true;
@@ -435,12 +489,12 @@ public class Menu {
             System.out.println("│    7. За каким Пользователем книга                        │");
             System.out.println("│    0. Вернуться в предыдущее меню                         │");
             System.out.println("└───────────────────────────────────────────────────────────┘");
-            System.out.print("Сделайте выбор:");
+            System.out.printf(service.getActivUser().getRole()==Role.ADMIN ? "(ВЫ АДМИНИСТРАТОР -'":"(ВЫ ПОЛЬЗОВАТЕЛЬ -'");
+            System.out.print(service.getActivUser().getEmail()+"') Сделайте выбор:") ;
 
-            int input = scanner.nextInt();
-            scanner.nextLine();
+            String input = scanner.nextLine();
 
-            if (input == 0) {
+            if (input.equals("0")) {
                 break;
             }
             showBookMenuCase(input);
@@ -450,84 +504,177 @@ public class Menu {
 
 
 
-    private void showBookMenuCase(int input) {
+    private void showBookMenuCase(String input) {
+        int i=0;
+        String s1="";
+        String s2="";
+        int lenName=0;
+        int lenAuthor=0;
         switch (input) {
-            case 1:
+            case "1":
                 //Список всех книг
                 if(service.getAllBooks()!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
                     System.out.println("Список всех книг:");
                     for(Book book: service.getAllBooks()) {
-                        System.out.println(" Название: '" + book.getName()+"'" + "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getAllBooks()) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" Занята");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг");
                 }
                 break;
 
-            case 2:
+            case "2":
                 //Список свободных
                 if(service.getFreeBooks()!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
                     System.out.println("Список свободных книг:");
                     for(Book book: service.getFreeBooks()) {
-                        System.out.println(" Название: '" + book.getName()+"'" + "  Автор:" + book.getAuthor()+
-                               "  ID книги:"+book.getId() );
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getFreeBooks()) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.println(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId());
+                        s1="";
+                        s2="";
                     }
                 } else {
-                      System.out.println("В библиотеке нет свободных книг");
+                    System.out.println("В библиотеке нет свободных книг");
                 }
                 break;
 
-            case 3:
+            case "3":
                 //Список всех книг,отсортированный по автору
                 if(service.getBooksSortByAuthor()!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
                     System.out.println("Список всех книг:");
                     for(Book book: service.getBooksSortByAuthor()) {
-                        System.out.println(" Название: '" + book.getName()+"'"+ "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getBooksSortByAuthor()) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" Занята");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг");
                 }
                 break;
 
-            case 4:
+            case "4":
                 //Список всех книг, отсортированный по названию книги
                 if(service.getBooksSortByName()!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println();
                     System.out.println("Список всех книг:");
                     for(Book book: service.getBooksSortByName()) {
-                        System.out.println(") Название: '" + book.getName()+"'"+ "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getBooksSortByName()) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" Занята");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг");
                 }
                 break;
 
-            case 5:
+            case "5":
                 //Поиск книг по Автору
                 System.out.println();
                 System.out.println();
                 System.out.println("Список книг по Автору:");
                 System.out.print("Введите Автора книги:");
                 String inputAuthor= scanner.nextLine();
-               // scanner.nextLine();
+                // scanner.nextLine();
                 if(service.getBooksByAuthor(inputAuthor)!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println("Список книг по автору - "+inputAuthor+" :");
                     for(Book book: service.getBooksByAuthor(inputAuthor)) {
-                        System.out.println(" Название: '" + book.getName() + "'" + "  Автор:" + book.getAuthor() +
-                                "  ID книги:" + book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getBooksByAuthor(inputAuthor)) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" Занята");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг с Автором-"+inputAuthor);
                 }
                 break;
 
-            case 6:
+            case "6":
                 //Поиск книг по Названию
                 System.out.println();
                 System.out.println();
@@ -535,17 +682,35 @@ public class Menu {
                 System.out.print("Введите Название книги:");
                 String inputName= scanner.nextLine();
                 if(service.getBooksByAuthor(inputName)!=null) {
+                    i=0;
+                    lenName=0;
+                    lenAuthor=0;
                     System.out.println("Список книг по автору - "+inputName+" :");
                     for(Book book: service.getBooksByName(inputName)) {
-                        System.out.println(" Название: '" + book.getName() +"'"+ "  Автор:" + book.getAuthor()+
-                                "  ID книги:"+book.getId());
+                        if (book.getName().length()>lenName) lenName=book.getName().length();
+                        if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
+                    }
+                    for(Book book: service.getBooksByName(inputName)) {
+                        i++;
+                        for(int j=0; j<lenName+2-book.getName().length();j++){
+                            s1=s1+" ";
+                        }
+                        for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
+                            s2=s2+" ";
+                        }
+                        System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:" + book.getAuthor()+s2+
+                                "  ID книги:"+book.getId()+"  Статус:");
+                        System.out.printf(book.getTakeDate()==null ? " Свободна":" Занята");
+                        System.out.println();
+                        s1="";
+                        s2="";
                     }
                 } else {
                     System.out.println("В библиотеке нет книг с Автором-"+inputName);
                 }
                 break;
 
-            case 7:
+            case "7":
                 //За каким Пользователем книга
                 System.out.println();
                 System.out.println();

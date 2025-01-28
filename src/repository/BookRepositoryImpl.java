@@ -5,6 +5,7 @@ import model.User;
 import utils.MyArrayList;
 import utils.MyList;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -170,5 +171,27 @@ public class BookRepositoryImpl implements BookRepository{
         }
         return list;
     }
+    @Override
+    public LocalDate getTakeBookDate (int idBook){
+        for (Book book : books) {
+            if (book.getId()==idBook) {
+                return book.getTakeDate();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean updateTakeBookDate (int idBook, LocalDate newDate){
+        for (Book book : books) {
+            if (book.getId()==idBook) {
+                book.setTakeDate(newDate);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
 }

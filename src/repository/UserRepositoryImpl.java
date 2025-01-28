@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
                 admin,
                 blockUser,
                 new User("3","3"),
-                new User("4@mail.com","4"),
+                new User("4","4"),
                 new User("5@mail.com","5")
         );
     }
