@@ -206,8 +206,7 @@ public class MainServiceImpl implements MainService{
     public boolean delBookById(int id) {
             Book book=bookRepository.getById(id);
             if (book!=null) {
-                int idDel = bookRepository.getAllBooks().indexOf(book);
-                bookRepository.deleteById(idDel);
+                bookRepository.deleteBook(book);
                 return true;
             } else {
                 System.out.println("НЕ ВЕРНЫЙ ID -"+id);

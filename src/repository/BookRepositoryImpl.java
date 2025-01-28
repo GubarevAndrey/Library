@@ -95,8 +95,8 @@ public class BookRepositoryImpl implements BookRepository{
 
 
     @Override
-    public void deleteById(int id) {
-        books.remove(id);
+    public void deleteBook(Book book) {
+        books.remove(book);
     }
 
     @Override

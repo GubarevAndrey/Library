@@ -33,7 +33,7 @@ public interface BookRepository {
 
 
     //Delete
-    void deleteById(int id);
+    void deleteBook(Book book);
 
     public void bookUpdateById(int id,String name, String author);
 
