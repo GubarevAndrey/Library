@@ -97,15 +97,13 @@ public class MainServiceImpl implements MainService{
     @Override
     public boolean delUser(String email){
         User isDelUser;
-        if (activUser.getRole()==Role.ADMIN) {
-            if (activUser.getEmail().equals(email)!=true) {
-                isDelUser = userRepository.delUser(email);
-                if (isDelUser != null) {
+        if (activUser.getEmail().equals(email)!=true) {
+            isDelUser = userRepository.delUser(email);
+            if (isDelUser != null) {
                     return true;
-                }
-            }else {
-                System.out.println("НЕЛЬЗЯ УДАЛЯТЬ САМОГО СЕБЯ !");
             }
+        }else {
+                System.out.println("НЕЛЬЗЯ УДАЛЯТЬ САМОГО СЕБЯ !");
         }
         return false;
     }
@@ -159,18 +157,12 @@ public class MainServiceImpl implements MainService{
             } else {
                  System.out.println("Книга с id:"+bookId+" не существует");
             }
-        return null;
+            return null;
     }
 
     @Override
-    public boolean addBook(String name, String author) {
-        if (activUser.getRole()==Role.ADMIN) {
+    public void addBook(String name, String author) {
             bookRepository.addBook(name,author);
-            return true;
-        } else {
-            System.out.println("Добавлять книги может только администратор");
-        }
-        return false;
     }
 
     @Override
@@ -209,10 +201,9 @@ public class MainServiceImpl implements MainService{
         }
         return null;
     }
-/*
+
     @Override
     public boolean delBookById(int id) {
-        if (activUser.getRole()==Role.ADMIN) {
             Book book=bookRepository.getById(id);
             if (book!=null) {
                 int idDel = bookRepository.getAllBooks().indexOf(book);
@@ -221,26 +212,6 @@ public class MainServiceImpl implements MainService{
             } else {
                 System.out.println("НЕ ВЕРНЫЙ ID -"+id);
             }
-        } else {
-            System.out.println("Удалять книги может только администратор");
-        }
-        return false;
-    }
-*/
-    public boolean delBookById(int id) {
-        int idInMyList=-1;
-        if (activUser.getRole()==Role.ADMIN) {
-            for(Book book:bookRepository.getAllBooks()) {
-                idInMyList++;
-                if(book.getId()==id) {
-                    bookRepository.deleteById(idInMyList);
-                    return true;
-                }
-            }
-            System.out.println("Вы ввели не правильный id книги");
-        } else {
-            System.out.println("Удалять книги может только администратор");
-        }
         return false;
     }
 
@@ -257,7 +228,6 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public boolean bookUpdateById(int id,String name, String author) {
-        if (activUser.getRole()==Role.ADMIN) {
             Book book = bookRepository.getById(id);
             if (book!=null) {
                 bookRepository.bookUpdateById(id, name, author);
@@ -265,16 +235,12 @@ public class MainServiceImpl implements MainService{
             } else {
                 System.out.println("Вы ввели не правильный id книги");
             }
-        }else {
-            System.out.println("Редактировать книги может только администратор");
-        }
         return false;
     }
 
 
     @Override
     public boolean UserUpdatePassword(String email,String password) {
-        if (activUser.getRole()==Role.ADMIN ) {
             User user =userRepository.getUserByEmail(email);
             if (user!=null) {
                 if(PersonValidation.isPasswordValid(password)) {
@@ -286,7 +252,6 @@ public class MainServiceImpl implements MainService{
             } else {
                 System.out.println("Пользователя с Email- "+email+" не существует!");
             }
-        }
         return false;
     }
 
@@ -302,12 +267,10 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public boolean UserStatusUpdate(String email,Role role){
-        boolean isUpdate;
-        if (activUser.getRole()==Role.ADMIN ) {
-            isUpdate=userRepository.UserStatusUpdate(email,role);
-            if (isUpdate == true) {
-                return true;
-            }
+        User user=userRepository.getUserByEmail(email);
+        if (user!=null) {
+            userRepository.UserStatusUpdate(email,role);
+            return true;
         }
         return false;
     }
@@ -332,12 +295,21 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public LocalDate getTakeBookDate(int idBook) {
-        return bookRepository.getTakeBookDate(idBook);
+        Book book= bookRepository.getById(idBook);
+        if ( book!=null) {
+            return bookRepository.getTakeBookDate(idBook);
+        }
+        return null;
     }
 
     @Override
     public boolean updateTakeBookDate(int idBook, LocalDate newDate) {
-        return bookRepository.updateTakeBookDate(idBook,newDate);
+        Book book= bookRepository.getById(idBook);
+        if ( book!=null) {
+            bookRepository.updateTakeBookDate(idBook, newDate);
+            return true;
+        }
+        return false;
     }
 
 }

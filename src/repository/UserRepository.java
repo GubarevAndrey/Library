@@ -14,13 +14,13 @@ public interface UserRepository {
     User getUserByEmail(String email);
 
     // изменение password
-    boolean UserUpdatePassword (String email, String newPassword);
+    void UserUpdatePassword (String email, String newPassword);
 
     User delUser(String email);
 
     public MyList<User> getUsers();
 
-    public boolean UserStatusUpdate(String email, Role role);
+    public void UserStatusUpdate(String email, Role role);
 
 
 }

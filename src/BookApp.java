@@ -15,7 +15,6 @@ import java.util.Date;
 public class BookApp {
     public static void main(String[] args) {
 
-
         UserRepository userRepository = new UserRepositoryImpl();
         BookRepository bookRepository = new BookRepositoryImpl();
 

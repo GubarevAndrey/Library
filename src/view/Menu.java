@@ -180,8 +180,15 @@ public class Menu {
                 System.out.println();
                 System.out.println("Выдача книги:");
                 System.out.print("Введите id книги:");
-                int idBook= scanner.nextInt();
-                scanner.nextLine();
+                String inputStr=scanner.nextLine();
+                Integer idBookInt= checkInput(inputStr);
+                int idBook=0;
+                if (idBookInt==null) {
+                    System.out.println("Сделайте корректный выбор...");
+                    break;
+                } else {
+                    idBook=idBookInt;
+                }
                 Book take =service.takeBook(idBook);
                 if(take!=null) {
                     System.out.println("Вы взяли книгу c названием- '"+take.getName()+"'   Автор-"+take.getAuthor()+"'  ID:"+idBook);
@@ -194,8 +201,15 @@ public class Menu {
                 System.out.println();
                 System.out.println("Возврат книги:");
                 System.out.print("Введите id книги:");
-                int idBook1= scanner.nextInt();
-                scanner.nextLine();
+                String inputStr1=scanner.nextLine();
+                Integer idBookInt1= checkInput(inputStr1);
+                int idBook1=0;
+                if (idBookInt1==null) {
+                    System.out.println("Сделайте корректный выбор...");
+                    break;
+                } else {
+                    idBook1=idBookInt1;
+                }
                 Book retBook =service.returnBook(idBook1);
                 if(retBook!=null) {
                     System.out.println("Вы Вернули книгу c названием- '"+retBook.getName()+
@@ -213,6 +227,15 @@ public class Menu {
                 System.out.println("Сделайте корректный выбор...");
         }
     }
+
+    private Integer checkInput(String input) {
+        try {
+            return Integer.valueOf(input);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 
     private  void  showAdminMenu(){
         exitAdminMenu=false;
@@ -376,12 +399,8 @@ public class Menu {
                 name= scanner.nextLine();
                 System.out.print("Введите автора книги:");
                 author= scanner.nextLine();
-                isAddBook=service.addBook(name,author);
-                if (isAddBook==true){
-                    System.out.println("Книга успешно добавлена");
-                } else {
-                    System.out.println("Книга не добавлена !");
-                }
+                service.addBook(name,author);
+                System.out.println("Книга успешно добавлена");
                 break;
 
             case "7":
@@ -390,8 +409,14 @@ public class Menu {
                 System.out.println();
                 System.out.println("УДАЛЕНИЕ книги.");
                 System.out.print("Введите ID книги:");
-                idBook= scanner.nextInt();
-                scanner.nextLine();
+                String inputStr=scanner.nextLine();
+                Integer idBookInt= checkInput(inputStr);
+                if (idBookInt==null) {
+                    System.out.println("Сделайте корректный выбор...");
+                    break;
+                } else {
+                    idBook=idBookInt;
+                }
                 isDelBook=service.delBookById(idBook);
                 if (isDelBook==true){
                     System.out.println("Книга успешно УДАЛЕНА");
@@ -406,8 +431,14 @@ public class Menu {
                 System.out.println();
                 System.out.println("Редактирование книги.");
                 System.out.print("Введите ID книги:");
-                idBook= scanner.nextInt();
-                scanner.nextLine();
+                String inputStr1=scanner.nextLine();
+                Integer idBookInt1= checkInput(inputStr1);
+                if (idBookInt1==null) {
+                    System.out.println("Сделайте корректный выбор...");
+                    break;
+                } else {
+                    idBook=idBookInt1;
+                }
                 System.out.print("Введите Новое название книги:");
                 name= scanner.nextLine();
                 System.out.print("Введите Нового автора книги:");

@@ -29,7 +29,7 @@ public interface MainService {
     Book takeBook(int bookId);
 
     //Добавить книгу
-    boolean addBook(String name, String author);
+    void addBook(String name, String author);
 
     //Список всех книг
     MyList<Book> getAllBooks();

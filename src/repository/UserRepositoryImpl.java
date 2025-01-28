@@ -54,27 +54,18 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean UserUpdatePassword(String email, String newPassword) {
-        for (User user: users) {
-            if (user.getEmail().equals(email)) {
-                user.setPassword(newPassword);
-                return true;
-            }
-        }
-        return false;
+    public void UserUpdatePassword(String email, String newPassword) {
+        User user=getUserByEmail(email);
+        user.setPassword(newPassword);
     }
 
 
 
     @Override
     public User delUser(String email) {
-        for (User user :users){
-            if(user.getEmail().equals(email)){
-                users.remove(user);
-                return user;
-            }
-        }
-        return null;
+        User user=getUserByEmail(email);
+        users.remove(user);
+        return user;
     }
 
     @Override
@@ -83,14 +74,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean UserStatusUpdate(String email,Role role){
-        for (User user :users){
-            if(user.getEmail().equals(email)){
-                user.setRole(role);
-                return true;
-            }
-        }
-        return false;
+    public void UserStatusUpdate(String email,Role role){
+        User user=getUserByEmail(email);
+        user.setRole(role);
     }
 
 }

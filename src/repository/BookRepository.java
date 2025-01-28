@@ -45,5 +45,5 @@ public interface BookRepository {
 
     public LocalDate getTakeBookDate (int idBook);
 
-    public boolean updateTakeBookDate (int idBook, LocalDate newDate);
+    public void updateTakeBookDate (int idBook, LocalDate newDate);
 }

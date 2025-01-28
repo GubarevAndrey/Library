@@ -88,34 +88,22 @@ public class BookRepositoryImpl implements BookRepository{
 
     @Override
     public void updateBookStatus(int id, boolean newStatus) {
-        for (Book book:books) {
-            if(book.getId()==id) {
-                book.setBusy(newStatus);
-                break;
-            }
-        }
+        Book book = getById(id);
+        book.setBusy(newStatus);
     }
+
 
 
     @Override
     public void deleteById(int id) {
-        for (Book book:books) {
-            if(book.getId()==id) {
-                books.remove(id);
-                break;
-            }
-        }
+        books.remove(id);
     }
 
     @Override
     public void bookUpdateById(int id,String name, String author) {
-        for (Book book:books) {
-            if(book.getId()==id) {
-                book.setName(name);
-                book.setAuthor(author);
-                break;
-            }
-        }
+        Book book= getById(id);
+        book.setName(name);
+        book.setAuthor(author);
     }
 
     @Override
@@ -173,23 +161,15 @@ public class BookRepositoryImpl implements BookRepository{
     }
     @Override
     public LocalDate getTakeBookDate (int idBook){
-        for (Book book : books) {
-            if (book.getId()==idBook) {
-                return book.getTakeDate();
-            }
-        }
-        return null;
+        Book book= getById(idBook);
+        return book.getTakeDate();
     }
 
+
     @Override
-    public boolean updateTakeBookDate (int idBook, LocalDate newDate){
-        for (Book book : books) {
-            if (book.getId()==idBook) {
-                book.setTakeDate(newDate);
-                return true;
-            }
-        }
-        return false;
+    public void updateTakeBookDate (int idBook, LocalDate newDate){
+        Book book= getById(idBook);
+        book.setTakeDate(newDate);
     }
 
 
