@@ -93,6 +93,7 @@ public class MainServiceImpl implements MainService{
         activUser=null;
     }
 
+
     @Override
     public boolean delUser(String email){
         User isDelUser;
@@ -110,20 +111,21 @@ public class MainServiceImpl implements MainService{
     }
 
 
+
+
+
     @Override
     public MyList<User> userList() {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return userRepository.getUsers();
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<User> list=userRepository.getUsers();
+        if (list!=null) {
+            return list;
         }
         return null;
     }
 
     @Override
     public Book takeBook(int bookId) {
-        LocalDate date= LocalDate.now();
-        if (activUser.getRole()!=Role.BLOCKED) {
+            LocalDate date= LocalDate.now();
             Book book = bookRepository.getById(bookId);
             if (book!=null){
                  if(book.isBusy()==false) {
@@ -137,17 +139,12 @@ public class MainServiceImpl implements MainService{
             } else {
                 System.out.println("Книга с id:"+bookId+" не существует");
             }
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
-        }
-        return null;
+            return null;
     }
 
 
     @Override
     public Book returnBook(int bookId) {
-   //     boolean find=false;
-        if (activUser.getRole()!=Role.BLOCKED) {
             Book book = bookRepository.getById(bookId);
             if (book!=null){
                 if(book.isBusy()==true && book.getUserUse().equals(activUser.getEmail())==true) {
@@ -162,9 +159,6 @@ public class MainServiceImpl implements MainService{
             } else {
                  System.out.println("Книга с id:"+bookId+" не существует");
             }
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
-        }
         return null;
     }
 
@@ -181,30 +175,27 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public MyList<Book> getAllBooks() {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getAllBooks();
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getAllBooks();
+        if (list!=null) {
+            return list;
         }
         return null;
     }
 
     @Override
     public MyList<Book> getBooksByAuthor(String author) {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getBookByAuthor(author);
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getBookByAuthor(author);
+        if (list!=null) {
+            return list;
         }
         return null;
     }
 
 
     public MyList<Book> getBooksByName(String name) {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getBooksByName(name);
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getBooksByName(name);
+        if (list!=null) {
+            return list;
         }
         return null;
     }
@@ -212,15 +203,30 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public MyList<Book> getFreeBooks() {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getFreeBooks();
-        } else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getFreeBooks();
+        if (list!=null) {
+            return list;
         }
         return null;
     }
-
+/*
     @Override
+    public boolean delBookById(int id) {
+        if (activUser.getRole()==Role.ADMIN) {
+            Book book=bookRepository.getById(id);
+            if (book!=null) {
+                int idDel = bookRepository.getAllBooks().indexOf(book);
+                bookRepository.deleteById(idDel);
+                return true;
+            } else {
+                System.out.println("НЕ ВЕРНЫЙ ID -"+id);
+            }
+        } else {
+            System.out.println("Удалять книги может только администратор");
+        }
+        return false;
+    }
+*/
     public boolean delBookById(int id) {
         int idInMyList=-1;
         if (activUser.getRole()==Role.ADMIN) {
@@ -240,16 +246,12 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public String findUserByBookId(int id) {
-        if (activUser.getRole()!=Role.BLOCKED) {
-            for (Book book : bookRepository.getAllBooks()) {
-                if (book.getId() == id) {
-                    return book.getUserUse();
-                }
+        for (Book book : bookRepository.getAllBooks()) {
+            if (book.getId() == id) {
+                return book.getUserUse();
             }
-            System.out.println("Вы ввели не правильный id книги");
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
         }
+        System.out.println("Вы ввели не правильный id книги");
         return null;
     }
 
@@ -291,14 +293,11 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public MyList<Book> getBooksByUser(String email) {
-        if (activUser.getRole()!=Role.BLOCKED) {
-           return bookRepository.getBooksByUser(email);
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getBooksByUser(email);
+        if (list!=null) {
+           return list;
         }
         return null;
-
-
     }
 
     @Override
@@ -315,20 +314,18 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public MyList<Book> getBooksSortByName(){
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getBooksSortByName();
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getBooksSortByName();
+        if (list!=null) {
+            return list;
         }
         return null;
     }
 
     @Override
     public MyList<Book> getBooksSortByAuthor(){
-        if (activUser.getRole()!=Role.BLOCKED) {
-            return bookRepository.getBooksSortByAuthor();
-        }else {
-            System.out.println("Вы ЗАБЛОКИРОВАНЫ ! Обратитесь к администратору");
+        MyList<Book> list =bookRepository.getBooksSortByAuthor();
+        if (list!=null) {
+            return list;
         }
         return null;
     }
