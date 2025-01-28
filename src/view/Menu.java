@@ -362,7 +362,7 @@ public class Menu {
                 System.out.println();
                 System.out.println();
                 System.out.println("УДАЛЕНИЕ пользователя.");
-                System.out.print("Введите email пользователя:");
+                System.out.print("Введите email пользователя для УДАЛЕНИЯ:");
                 email= scanner.nextLine();
                 boolean isDel= service.delUser(email);
                 if (isDel==true) {

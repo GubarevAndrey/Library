@@ -91,9 +91,13 @@ public class MainServiceImpl implements MainService{
     public boolean delUser(String email){
         User isDelUser;
         if (activUser.getRole()==Role.ADMIN) {
-            isDelUser=userRepository.delUser(email);
-            if (isDelUser!=null) {
-                return true;
+            if (activUser.getEmail().equals(email)!=true) {
+                isDelUser = userRepository.delUser(email);
+                if (isDelUser != null) {
+                    return true;
+                }
+            }else {
+                System.out.println("НЕЛЬЗЯ УДАЛЯТЬ САМОГО СЕБЯ !");
             }
         }
         return false;
