@@ -5,6 +5,7 @@ import model.User;
 import model.Book;
 import service.MainService;
 import utils.MyList;
+import utils.PersonValidation;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -26,12 +27,20 @@ public class Menu {
         showMenu();
     }
 
+
     private void showMenu() {
-        boolean isAutoriz;
+        boolean isAutoriz=false;
+        boolean isRegistration=false;
         System.out.println();
         System.out.println();
-        isAutoriz = authorization();
-        if (isAutoriz == true) {
+        int input=InputUser();
+        if (input==1) {
+            isAutoriz = authorizationUser();
+        }
+        if (input==2) {
+            isRegistration = registrationUser();
+        }
+        if (isAutoriz == true || isRegistration==true) {
             while (true) {
                 System.out.println();
                 System.out.println();
@@ -40,7 +49,7 @@ public class Menu {
                 System.out.println("║         1. Меню книг                   ║");
                 System.out.println("║         2. Меню пользователя           ║");
                 System.out.println("║         3. Меню администратора         ║");
-                System.out.println("║         0- выход из системы            ║");
+                System.out.println("║         0- Выход из системы            ║");
                 System.out.println("╚════════════════════════════════════════╝");
                 System.out.print("Сделайте выбор:");
 
@@ -87,23 +96,79 @@ public class Menu {
     }
 
 
-    private  boolean   authorization(){
+    private int InputUser() {
+        while (true) {
+            System.out.println();
+            System.out.println("┌──────────────────────────────────────┐");
+            System.out.println("│    ДОБРО ПОЖАЛОВАТЬ В БИБЛИОТЕКУ     │");
+            System.out.println("│   1. Авторизация                     │");
+            System.out.println("│   2. Регистрация нового пользователя │");
+            System.out.println("│   0. Выход                           │");
+            System.out.println("└──────────────────────────────────────┘");
+            System.out.print("Сделайте выбор:");
+            String input = scanner.nextLine();
+            if (input.equals("0")) {
+                System.out.println("Давай До свидания...");
+                // Завершить работу приложения
+                System.exit(0);
+            }
+            if (input.equals("1")==true) return 1;
+            if (input.equals("2")==true) return 2;
+            System.out.print("Сделайте корректный выбор....");
+            waitRead();
+        }
+    }
+
+
+
+
+    private  boolean   authorizationUser() {
+        String email;
+        String password;
+        boolean register;
         System.out.println();
-        System.out.println("Авторизация");
-        System.out.print("Введите email:");
-        String email= scanner.nextLine();
-        if(email.length()!=0 && email!=null) {
+        System.out.println();
+        System.out.print("Введите Email:");
+        email = scanner.nextLine();
+        if (email.length() != 0 && email != null && service.isEmailExist(email) == true) {
             if (service.isUserBLOCKED(email) == true) {
                 System.out.println("Вы ЗАБАНЕНЫ! Обратитесь к Администратору");
                 return false;
             }
             System.out.print("Введите пароль:");
-            String password = scanner.nextLine();
-
+            password = scanner.nextLine();
             boolean log = service.loginUser(email, password);
             if (log == true) {
                 return true;
             }
+        } else {
+            System.out.println("Авторизация ПРОВАЛЕНА !");
+        }
+        return false;
+    }
+
+    private  boolean   registrationUser() {
+        String email;
+        String password;
+        boolean register;
+
+        System.out.println();
+        System.out.println();
+        System.out.println("Регистрация нового Пользователя.");
+        System.out.print("Введите Email пользователя:");
+        email= scanner.nextLine();
+        if(PersonValidation.isEmailValid(email)==false) {
+            System.out.println("НЕ КОРЕКТНЫЙ EMAIL !");
+            return false;
+        }
+        System.out.print("Введите Пароль пользователя:");
+        password= scanner.nextLine();
+        register=service.registerUser(email,password);
+        if (register==true){
+            System.out.println("Пользователь- "+email+" успешно зарегистрирован");
+            return true;
+        } else {
+            System.out.println("Регистрация провалена !");
         }
         return false;
     }
@@ -250,29 +315,16 @@ public class Menu {
         String password;
         String name;
         String author;
-        boolean reg;
+        boolean register;
         boolean updatePassword;
-        boolean isDelBook;
+        boolean isDeleteBook;
         boolean isUpdateBook;
         int idBook;
 
         switch (input) {
             case "1":
                 //Регистрация нового пользователя
-                System.out.println();
-                System.out.println();
-                System.out.println("Регистрация нового Пользователя:");
-                System.out.print("Введите email пользователя:");
-                email= scanner.nextLine();
-                System.out.print("Введите пароль пользователя:");
-                password= scanner.nextLine();
-
-                reg=service.registerUser(email,password);
-                if (reg==true){
-                    System.out.println("Пользователь- "+email+" успешно зарегистрирован");
-                } else {
-                    System.out.println("Регистрация провалена !");
-                }
+                registrationUser();
                 break;
 
             case "2":
@@ -383,8 +435,8 @@ public class Menu {
                 } else {
                     idBook=idBookInt;
                 }
-                isDelBook=service.delBookById(idBook);
-                if (isDelBook==true){
+                isDeleteBook=service.delBookById(idBook);
+                if (isDeleteBook==true){
                     System.out.println("Книга успешно УДАЛЕНА");
                 } else {
                     System.out.println("Книга НЕ УДАЛЕНА !");
@@ -582,7 +634,6 @@ public class Menu {
             if (book.getName().length()>lenName) lenName=book.getName().length();
             if (book.getAuthor().length()>lenAuthor) lenAuthor=book.getAuthor().length();
         }
-        System.out.println("┌───────────────────────────────────────────────────────────");
         for(Book book: list) {
             i++;
             for(int j=0; j<lenName+2-book.getName().length();j++){
@@ -591,14 +642,11 @@ public class Menu {
             for(int j=0; j<lenAuthor+2-book.getAuthor().length();j++){
                 s2=s2+" ";
             }
-            System.out.print("│"+i+") Название: '" + book.getName()+"'"+s1 + "  Автор:'" + book.getAuthor()+"'"+s2+
+            System.out.print(i+") Название: '" + book.getName()+"'"+s1 + "  Автор:'" + book.getAuthor()+"'"+s2+
                     "  ID книги:"+book.getId()+"  Статус:");
             System.out.printf(book.getTakeDate()==null ? " Свободна":" За пользователем-'"+
                     book.getUserUse()+"'  Взята-"+book.getTakeDate()+" ("+
                     (date.until(book.getTakeDate(),ChronoUnit.DAYS))+" дней назад)");
-            System.out.println();
-            System.out.printf(book.getId()<service.getAllBooks().size() ? "├───────────────────────────────────────────────────────────" :
-                            "└───────────────────────────────────────────────────────────");
             System.out.println();
             s1="";
             s2="";

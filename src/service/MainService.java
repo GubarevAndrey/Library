@@ -77,4 +77,6 @@ public interface MainService {
 
     public boolean updateTakeBookDate(int idBook, LocalDate newDate);
 
+    public boolean isEmailExist(String email);
+
 }

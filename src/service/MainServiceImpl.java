@@ -29,26 +29,29 @@ public class MainServiceImpl implements MainService{
 
     @Override
     public boolean registerUser(String email, String password) {
-        if (activUser.getRole()==Role.ADMIN) {
-            if (!PersonValidation.isEmailValid(email)) {
-                System.out.println("Email - "+email+" не корректный !");
-                return false;
-            }
-            if (!PersonValidation.isPasswordValid(password)) {
-                System.out.println("Пароль - "+password+" не корректный.");
-                return false;
-            }
+
+        if (!PersonValidation.isEmailValid(email)) {
+            System.out.println("Email - "+email+" не корректный !");
+            return false;
+        }
+        if (!PersonValidation.isPasswordValid(password)) {
+            System.out.println("Пароль - "+password+" не корректный.");
+            return false;
+        }
 
             // Проверим есть ли такой пользователь уже
-            if (userRepository.isEmailExist(email)) {
-                System.out.println("Пользователь с Email- "+email+" уже существует !");
-                return false;
-            }
-            userRepository.addUser(email, password);
-            return true;
+        if (userRepository.isEmailExist(email)) {
+            System.out.println("Пользователь с Email- "+email+" уже существует !");
+            return false;
         }
-        return false;
+        User user=userRepository.addUser(email, password);
+        if (activUser==null) {
+            activUser = user;
+        }
+        return true;
     }
+
+
 
     @Override
     public boolean loginUser(String email, String password) {
@@ -311,4 +314,8 @@ public class MainServiceImpl implements MainService{
         return false;
     }
 
+
+    public boolean isEmailExist(String email) {
+        return userRepository.isEmailExist(email);
+    }
 }
