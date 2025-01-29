@@ -69,7 +69,7 @@ public class Menu {
     }
 
     private void showMenuCase(String choice) {
-        boolean isAutoriz;
+       // boolean isAutoriz;
         switch (choice) {
             case "1":
                     showBookMenu();
@@ -352,8 +352,15 @@ public class Menu {
                 System.out.print("Введите email пользователя:");
                 email= scanner.nextLine();
                 System.out.print("Введите статус пользователя (1-User, 2- BLOCKED, 3-ADMIN)");
-                int inputStatus= scanner.nextInt();
-                scanner.nextLine();
+                String inputStatusStr= scanner.nextLine();
+                Integer status= checkInput(inputStatusStr);
+                int inputStatus=0;
+                if (status==null) {
+                    System.out.println("Сделайте корректный выбор...");
+                    break;
+                } else {
+                    inputStatus=status;
+                }
                 Role role = null;
                 boolean isUpdate=false;
                 if (inputStatus == 1) role = Role.USER;
@@ -481,7 +488,6 @@ public class Menu {
                 break;
 
             case "0":
-                //logout администратора и возврат в предыдущ меню
                 exitAdminMenu=true;
                 System.out.println("Вы вышли из Меню Администратора");
                 waitRead();
@@ -518,6 +524,7 @@ public class Menu {
                 break;
             }
             showBookMenuCase(input);
+            if (exitBookMenu==true) break;
             waitRead();
         }
     }
@@ -651,7 +658,6 @@ public class Menu {
             s1="";
             s2="";
         }
-
     }
 
 
